@@ -2,7 +2,7 @@
 
 A framework for games written in cpp with opengl and glfw
 
-The framework itself is included in the `src/gfx` folder and `src/Main.h` is an example implementation.
+The goal is simply to provide a base for developing games. Removing the need to spend excessive amounts of time setting up a project. Allowing for more time to write your engine and/or game. The framework itself is included in the `src/gfx` folder and `src/Main.h` is an example implementation.
 
 ---
 
