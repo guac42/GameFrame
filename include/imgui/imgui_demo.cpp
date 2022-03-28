@@ -1107,10 +1107,10 @@ static void ShowDemoWindowWidgets()
         static int item_current_2 = 0;
         ImGui::Combo("combo 2 (one-liner)", &item_current_2, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
 
-        // Simplified one-liner Combo() using an array of const char*
+        // Simplified one-liner Combo() using an vao of const char*
         // This is not very useful (may obsolete): prefer using BeginCombo()/EndCombo() for full control.
         static int item_current_3 = -1; // If the selection isn't within 0..count, Combo won't display a preview
-        ImGui::Combo("combo 3 (array)", &item_current_3, items, IM_ARRAYSIZE(items));
+        ImGui::Combo("combo 3 (vao)", &item_current_3, items, IM_ARRAYSIZE(items));
 
         // Simplified one-liner Combo() using an accessor function
         struct Funcs { static bool ItemGetter(void* data, int n, const char** out_str) { *out_str = ((const char**)data)[n]; return true; } };
@@ -1646,7 +1646,7 @@ static void ShowDemoWindowWidgets()
         ImGui::PlotLines("Frame Times", arr, IM_ARRAYSIZE(arr));
         ImGui::PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
-        // Fill an array of contiguous float values to plot
+        // Fill an vao of contiguous float values to plot
         // Tip: If your float aren't contiguous but part of a structure, you can pass a pointer to your first float
         // and the sizeof() of your structure in the "stride" parameter.
         static float values[90] = {};
@@ -6531,8 +6531,8 @@ struct ExampleAppConsole
         //   without processing all the ones before)
         // You cannot this code as-is if a filter is active because it breaks the 'cheap random-access' property.
         // We would need random-access on the post-filtered list.
-        // A typical application wanting coarse clipping and filtering may want to pre-compute an array of indices
-        // or offsets of items that passed the filtering test, recomputing this array when user changes the filter,
+        // A typical application wanting coarse clipping and filtering may want to pre-compute an vao of indices
+        // or offsets of items that passed the filtering test, recomputing this vao when user changes the filter,
         // and appending newly elements as they are inserted. This is left as a task to the user until we can manage
         // to improve this example code!
         // If your items are of variable height:
@@ -6548,7 +6548,7 @@ struct ExampleAppConsole
                 continue;
 
             // Normally you would store more information in your item than just a string.
-            // (e.g. make Items[] an array of structure, store color/type etc.)
+            // (e.g. make Items[] an vao of structure, store color/type etc.)
             ImVec4 color;
             bool has_color = false;
             if (strstr(item, "[error]"))          { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
@@ -6849,7 +6849,7 @@ struct ExampleAppLog
             // on your side is recommended. Using ImGuiListClipper requires
             // - A) random access into your data
             // - B) items all being the  same height,
-            // both of which we can handle since we an array pointing to the beginning of each line of text.
+            // both of which we can handle since we an vao pointing to the beginning of each line of text.
             // When using the filter (in the block of code above) we don't have random access into the data to display
             // anymore, which is why we don't use the clipper. Storing or skimming through the search result would make
             // it possible (and would be recommended if you want to search through tens of thousands of entries).
@@ -7570,7 +7570,7 @@ static void ShowExampleAppCustomRendering(bool* p_open)
 struct MyDocument
 {
     const char* Name;       // Document title
-    bool        Open;       // Set when open (we keep an array of all available documents to simplify demo code!)
+    bool        Open;       // Set when open (we keep an vao of all available documents to simplify demo code!)
     bool        OpenPrev;   // Copy of Open from last update.
     bool        Dirty;      // Set when the document has been modified
     bool        WantClose;  // Set when the document

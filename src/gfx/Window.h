@@ -77,7 +77,7 @@ private:
     static void _cursor_callback(GLFWwindow *handle, double xp, double yp) {
         Window *window = GetWindow(handle);
         glm::vec2 p{xp, yp};
-        window->mouseManager.delta.y = window->mouseManager.position.y - p.y;
+        window->mouseManager.delta.y = p.y - window->mouseManager.position.y;
         window->mouseManager.delta.x = p.x - window->mouseManager.position.x;
         window->mouseManager.delta = glm::clamp(window->mouseManager.delta, -100.0f, 100.0f);
         window->mouseManager.position = p;
@@ -110,6 +110,7 @@ public:
 
     Window(int width, int height, const std::string& title) : Window(width, height, 4, 5, title) {}
 
+    /// Warning: Some features require opengl 4.5
     Window(int width, int height, int versionMajor, int versionMinor, const std::string& title) {
         this->width = width;
         this->height = height;
@@ -204,6 +205,10 @@ public:
         this->OnClose();
         glfwTerminate();
         exit(0);
+    }
+
+    inline float deltaTime() const {
+        return (float)this->frame_delta / NS_PER_SECOND;
     }
 
 protected:

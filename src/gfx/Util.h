@@ -8,13 +8,13 @@
 #define NS_PER_MS (1000000)
 
 // Basically a macro, forced inline for time efficiency
-__forceinline static unsigned long long NOW() {
+inline static unsigned long long NOW() {
     struct timespec ts{};
     timespec_get(&ts, TIME_UTC);
     return (ts.tv_sec * NS_PER_SECOND) + ts.tv_nsec;
 }
 
-static void DELAY(unsigned long long nanos) {
+inline static void DELAY(unsigned long long nanos) {
     unsigned long long start = NOW(), now = start;
     while (now - start < nanos) {
         std::this_thread::yield();

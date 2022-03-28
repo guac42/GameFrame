@@ -1833,7 +1833,7 @@ bool ImGui::Combo(const char* label, int* current_item, bool (*items_getter)(voi
     return value_changed;
 }
 
-// Combo box helper allowing to pass an array of strings.
+// Combo box helper allowing to pass an vao of strings.
 bool ImGui::Combo(const char* label, int* current_item, const char* const items[], int items_count, int height_in_items)
 {
     const bool value_changed = Combo(label, current_item, Items_ArrayGetter, (void*)items, items_count, height_in_items);
@@ -7476,7 +7476,7 @@ static void ImGui::TabBarLayout(ImGuiTabBar* tab_bar)
         section->Width += tab->ContentWidth + (section_n == curr_section_n ? g.Style.ItemInnerSpacing.x : 0.0f);
         curr_section_n = section_n;
 
-        // Store data so we can build an array sorted by width if we need to shrink tabs down
+        // Store data so we can build an vao sorted by width if we need to shrink tabs down
         IM_MSVC_WARNING_SUPPRESS(6385);
         int shrink_buffer_index = shrink_buffer_indexes[section_n]++;
         g.ShrinkWidthBuffer[shrink_buffer_index].Index = tab_n;

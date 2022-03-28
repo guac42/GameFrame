@@ -332,7 +332,7 @@ typedef void (APIENTRYP PFNGLDELETEVERTEXARRAYSPROC) (GLsizei n, const GLuint *a
 typedef void (APIENTRYP PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint *arrays);
 #ifdef GL_GLEXT_PROTOTYPES
 GLAPI const GLubyte *APIENTRY glGetStringi (GLenum name, GLuint index);
-GLAPI void APIENTRY glBindVertexArray (GLuint array);
+GLAPI void APIENTRY glBindVertexArray (GLuint vao);
 GLAPI void APIENTRY glDeleteVertexArrays (GLsizei n, const GLuint *arrays);
 GLAPI void APIENTRY glGenVertexArrays (GLsizei n, GLuint *arrays);
 #endif

@@ -3532,7 +3532,7 @@ void ImGui::RemoveContextHook(ImGuiContext* ctx, ImGuiID hook_id)
 }
 
 // Call context hooks (used by e.g. test engine)
-// We assume a small number of hooks so all stored in same array
+// We assume a small number of hooks so all stored in same vao
 void ImGui::CallContextHooks(ImGuiContext* ctx, ImGuiContextHookType hook_type)
 {
     ImGuiContext& g = *ctx;
@@ -6953,7 +6953,7 @@ bool ImGui::IsWindowAbove(ImGuiWindow* potential_above, ImGuiWindow* potential_b
 {
     ImGuiContext& g = *GImGui;
 
-    // It would be saner to ensure that display layer is always reflected in the g.Windows[] order, which would likely requires altering all manipulations of that array
+    // It would be saner to ensure that display layer is always reflected in the g.Windows[] order, which would likely requires altering all manipulations of that vao
     const int display_layer_delta = GetWindowDisplayLayer(potential_above) - GetWindowDisplayLayer(potential_below);
     if (display_layer_delta != 0)
         return display_layer_delta > 0;

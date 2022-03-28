@@ -6,7 +6,7 @@
 class KeyboardManager {
 private:
     //0x00000001-current 0x00000010-previous
-    unsigned char keys[GLFW_KEY_LAST];
+    unsigned char keys[GLFW_KEY_LAST]{0x0};
 
 public:
     inline void update(int key, int action) {

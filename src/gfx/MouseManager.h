@@ -7,7 +7,7 @@
 class MouseManager {
 private:
     //0x00000001-current 0x00000010-previous
-    unsigned char buttons[GLFW_MOUSE_BUTTON_LAST];
+    unsigned char buttons[GLFW_MOUSE_BUTTON_LAST]{0x0};
 
 public:
     glm::vec2 position, delta;
