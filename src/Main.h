@@ -25,13 +25,12 @@ public:
 
     void OnLoad() override {
         glEnable(GL_DEPTH_TEST);
-        //glEnable(GL_CULL_FACE);
 
         {
             float data[]{
                     -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-                    0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-                    0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+                    0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+                    0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
             };
 
             Buffer dataBuffer;
@@ -88,7 +87,7 @@ public:
         program->Upload("p", this->projection);
         vao->Bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        //this->skybox->Render(this->projection, this->camera.getView());
+        this->skybox->Render(this->projection, this->camera.getView());
     }
 
     void OnGameTick() override {

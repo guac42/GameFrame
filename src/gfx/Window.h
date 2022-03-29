@@ -18,6 +18,15 @@
 #ifndef VSYNC
 #define VSYNC (true)
 #endif
+#ifndef KEYBIND_FULLSCREEN
+#define KEYBIND_FULLSCREEN GLFW_KEY_F
+#endif
+#ifndef KEYBIND_QUIT
+#define KEYBIND_QUIT GLFW_KEY_ESCAPE
+#endif
+#ifndef KEYBIND_TOGGLE_CURSOR
+#define KEYBIND_TOGGLE_CURSOR GLFW_KEY_T
+#endif
 
 #define GetWindow(handle) ((Window*)glfwGetWindowUserPointer(handle))
 
@@ -44,7 +53,7 @@ private:
         Window *window = GetWindow(handle);
         switch (key) {
             // Fullscreen
-            case GLFW_KEY_F:
+            case KEYBIND_FULLSCREEN:
                 if (action == GLFW_PRESS) {
                     if (glfwGetWindowAttrib(handle, GLFW_MAXIMIZED)) {
                         glfwRestoreWindow(handle);
@@ -54,12 +63,12 @@ private:
                 }
                 break;
             // Exit
-            case GLFW_KEY_ESCAPE:
+            case KEYBIND_QUIT:
                 if (action == GLFW_PRESS)
                     glfwSetWindowShouldClose(handle, GLFW_TRUE);
                 break;
             // Lock cursor
-            case GLFW_KEY_T:
+            case KEYBIND_TOGGLE_CURSOR:
                 if (action == GLFW_PRESS)
                     glfwSetInputMode(handle, GLFW_CURSOR,
                                      glfwGetInputMode(handle, GLFW_CURSOR) == GLFW_CURSOR_NORMAL
@@ -235,6 +244,13 @@ protected:
     virtual void OnResize() = 0;
 
     virtual void OnKeyPress() = 0;
+
+    void ToggleCursorLock() const {
+        glfwSetInputMode(this->handle, GLFW_CURSOR,
+                         glfwGetInputMode(this->handle, GLFW_CURSOR) == GLFW_CURSOR_NORMAL
+                         ? GLFW_CURSOR_DISABLED
+                         : GLFW_CURSOR_NORMAL);
+    }
 };
 
 #undef GetWindow

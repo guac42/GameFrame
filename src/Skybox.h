@@ -22,11 +22,9 @@ public:
                                            "uniform mat4 uProjection, uView;\n"
                                            "out vec3 eyeDir;\n"
                                            "void main() {\n"
-                                           "    mat4 inverseProjection = inverse(uProjection);\n"
-                                           "    mat3 inverseModelview = transpose(mat3(inverse(uView)));\n"
-                                           "    vec3 unprojected = (inverseProjection * vec4(aPosition, 1.0f)).xyz;\n"
-                                           "    eyeDir = inverseModelview * unprojected;\n"
-                                           "    gl_Position = vec4(aPosition, 1.0f);\n"
+                                           "    eyeDir = aPosition;\n"
+                                           "    vec4 pos = uProjection * mat4(mat3(uView)) * vec4(aPosition, 1.0);\n"
+                                           "    gl_Position = pos.xyww;\n"
                                            "}", false),
                *new Shader(Shader::Fragment, "#version 430 core\n"
                                              "uniform samplerCube uTexture;\n"
@@ -42,25 +40,35 @@ public:
         if (!data)
             printf("Cubemap texture failed to load at path: %s\n", texturePath.c_str());
         int xStride = width/4, yStride = height/3;
-        int type = comps == 4 ? GL_RGBA : GL_RGB;
+        int format = comps == 4 ? GL_RGBA : GL_RGB;
 
-        this->texture.ImmutableAllocate(xStride, yStride, 1, GL_SRGB8_ALPHA8);
+        // Temporary Texture to copy from
+        Texture whole(GL_TEXTURE_2D);
+        whole.Bind();
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
-        glTextureSubImage3D(this->texture.getId(), 0, 2*xStride,   yStride, 0, xStride, yStride, 1, type, GL_UNSIGNED_BYTE, data); //right
-        glTextureSubImage3D(this->texture.getId(), 0,         0,   yStride, 1, xStride, yStride, 1, type, GL_UNSIGNED_BYTE, data); //left
-        glTextureSubImage3D(this->texture.getId(), 0,   xStride,         0, 2, xStride, yStride, 1, type, GL_UNSIGNED_BYTE, data); //bottom
-        glTextureSubImage3D(this->texture.getId(), 0,   xStride, 2*yStride, 3, xStride, yStride, 1, type, GL_UNSIGNED_BYTE, data); //top
-        glTextureSubImage3D(this->texture.getId(), 0,   xStride,   yStride, 4, xStride, yStride, 1, type, GL_UNSIGNED_BYTE, data); //front
-        glTextureSubImage3D(this->texture.getId(), 0, 3*xStride,   yStride, 5, xStride, yStride, 1, type, GL_UNSIGNED_BYTE, data); //back
+        // Allocate cube map
+        this->texture.ImmutableAllocate(xStride, yStride, 0, GL_RGB8);
 
-        /*this->texture.Bind();
-
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, data);*/
+        // Copy faces
+        glCopyImageSubData(whole.getId(), GL_TEXTURE_2D, 0, 2*xStride,   yStride, 0,
+                           this->texture.getId(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
+                           xStride, yStride, 1);
+        glCopyImageSubData(whole.getId(), GL_TEXTURE_2D, 0,         0,   yStride, 0,
+                           this->texture.getId(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 1,
+                           xStride, yStride, 1);
+        glCopyImageSubData(whole.getId(), GL_TEXTURE_2D, 0,   xStride,         0, 0,
+                           this->texture.getId(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 2,
+                           xStride, yStride, 1);
+        glCopyImageSubData(whole.getId(), GL_TEXTURE_2D, 0,   xStride, 2*yStride, 0,
+                           this->texture.getId(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 3,
+                           xStride, yStride, 1);
+        glCopyImageSubData(whole.getId(), GL_TEXTURE_2D, 0,   xStride,   yStride, 0,
+                           this->texture.getId(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 4,
+                           xStride, yStride, 1);
+        glCopyImageSubData(whole.getId(), GL_TEXTURE_2D, 0, 3*xStride,   yStride, 0,
+                           this->texture.getId(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 5,
+                           xStride, yStride, 1);
 
         Image::free(data);
 
@@ -69,9 +77,8 @@ public:
         this->texture.TextureParam(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
         Buffer buffer;
-        buffer.Allocate(sizeof(vertices), (void*)vertices, GL_DYNAMIC_STORAGE_BIT);
+        buffer.Allocate(sizeof(vertices), (void *)vertices, GL_DYNAMIC_STORAGE_BIT);
 
-        this->vao.Bind();
         this->vao.AddSourceBuffer(buffer, 0, 3*sizeof(float));
         this->vao.SetAttribFormat(0, 3, GL_FLOAT);
 
@@ -84,10 +91,12 @@ public:
         this->program.Use();
         this->program.Upload("uProjection", projection);
         this->program.Upload("uView", view);
+
         this->vao.Bind();
         Texture::Activate(GL_TEXTURE0);
         this->texture.Bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
         glDepthFunc(GL_LESS);
     }
 

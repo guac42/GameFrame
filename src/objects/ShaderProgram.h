@@ -53,8 +53,9 @@ public:
         int compiled;
         glGetShaderiv(this->id, GL_COMPILE_STATUS, &compiled);
         if (compiled) return;
+
         glGetShaderiv(this->id, GL_INFO_LOG_LENGTH, &compiled);
-        char infoLog[compiled];
+        char* infoLog = (char*)malloc(compiled);
         glGetShaderInfoLog(this->id, compiled, &compiled, infoLog);
         printf("Shader Compilation Error:\n%s\n", infoLog);
     }
@@ -86,8 +87,9 @@ public:
         int linked;
         glGetProgramiv(this->id, GL_LINK_STATUS, &linked);
         if (linked) return;
+
         glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &linked);
-        char infoLog[linked];
+        char* infoLog = (char*)malloc(linked);
         glGetProgramInfoLog(this->id, linked, &linked, infoLog);
         printf("Program Link Error:\n%s\n", infoLog);
     }
@@ -122,6 +124,10 @@ public:
 
     void Upload(const std::string& name, float x) const {
         glProgramUniform1fv(this->id, GetUniformLocation(name), 1, &x);
+    }
+
+    void Upload(const std::string& name, int x) const {
+        glProgramUniform1iv(this->id, GetUniformLocation(name), 1, &x);
     }
 
     virtual ~Program() {
